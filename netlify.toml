@@ -1,0 +1,4 @@
+# Static site, no build step. (Cloudflare Pages ignores this file.)
+[build]
+  publish = "."
+  command = ""

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>P1P1 Trainer</title>
+  <meta name="description" content="Open a virtual MTG draft pack, make your pick or rank the pack, then compare against 17lands data.">
+  <meta name="theme-color" content="#10181b">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand"><span class="mark">P1</span><span class="brand-name">P1P1 Trainer</span></div>
+    <div class="controls">
+      <label class="ctl"><span>Set</span><select id="set"></select></label>
+      <label class="ctl"><span>Score by</span>
+        <select id="metric">
+          <option value="gih">GIH WR</option>
+          <option value="iwd">IWD</option>
+          <option value="ata">ATA</option>
+          <option value="alsa">ALSA</option>
+        </select>
+      </label>
+      <div class="seg" role="radiogroup" aria-label="Mode">
+        <button type="button" data-mode="pick" role="radio">Pick</button>
+        <button type="button" data-mode="rank" role="radio">Rank</button>
+      </div>
+      <button type="button" id="statsBtn" class="ghost" title="Progress (S)">Progress</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="status">
+      <p id="hint"></p>
+      <p id="meta" class="muted"></p>
+    </div>
+    <section id="pack" class="pack" aria-live="polite"></section>
+    <div id="empty" class="empty" hidden></div>
+  </main>
+
+  <footer class="actionbar">
+    <p id="summary" class="summary"></p>
+    <div class="actions">
+      <button type="button" id="resetRank" class="ghost" hidden>Reset taps</button>
+      <button type="button" id="reveal" class="primary" hidden>Reveal <kbd>Enter</kbd></button>
+      <button type="button" id="next" class="primary">New pack <kbd>N</kbd></button>
+    </div>
+  </footer>
+
+  <dialog id="zoom" class="zoom">
+    <form method="dialog"><button class="close" aria-label="Close">×</button></form>
+    <div id="zoomBody"></div>
+  </dialog>
+
+  <dialog id="stats" class="stats">
+    <form method="dialog" class="stats-head">
+      <h2>Progress</h2>
+      <button class="close" aria-label="Close">×</button>
+    </form>
+    <div id="statsBody"></div>
+  </dialog>
+
+  <script src="vendor/Sortable.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

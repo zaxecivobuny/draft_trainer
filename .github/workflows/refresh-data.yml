@@ -1,0 +1,43 @@
+name: Refresh 17lands data
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"   # Mondays 09:17 UTC
+  workflow_dispatch:
+    inputs:
+      sets:
+        description: "Space-separated set codes (blank = live + missing)"
+        required: false
+      all:
+        description: "Refetch every set"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch
+        run: |
+          ARGS=""
+          if [ "${{ inputs.all }}" = "true" ]; then ARGS="--all"; fi
+          if [ -n "${{ inputs.sets }}" ]; then ARGS="--sets ${{ inputs.sets }}"; fi
+          python scripts/fetch_17lands.py $ARGS
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain data)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data
+            git commit -m "data: refresh 17lands snapshot"
+            git push
+          else
+            echo "No changes"
+          fi
