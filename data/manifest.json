@@ -1,0 +1,23 @@
+{
+ "updated": "2026-10-15T17:25:39+00:00",
+ "sets": [
+  {
+   "code": "FRA",
+   "name": "Reality Fracture",
+   "start": "2026-09-29T15:00:00Z",
+   "fetched": "2026-10-15T17:25:39+00:00",
+   "cards": 290,
+   "rated": 171,
+   "live": true
+  },
+  {
+   "code": "LCI",
+   "name": "The Lost Caverns of Ixalan",
+   "start": "2023-11-14T15:00:00Z",
+   "fetched": "2026-10-15T17:25:39+00:00",
+   "cards": 286,
+   "rated": 1,
+   "live": false
+  }
+ ]
+}
