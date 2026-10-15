@@ -1,5 +1,5 @@
 /* Service worker: app shell precache, network-first data, cache-first card images. */
-const VERSION = "p1p1-v1";
+const VERSION = "p1p1-v3";
 const SHELL = `${VERSION}-shell`;
 const DATA = `${VERSION}-data`;
 const IMG = "p1p1-img"; // not versioned: card art never changes

@@ -151,10 +151,10 @@
     const { ranks, k, best } = trueRanks(S.pack, m);
     const byId = new Map(S.pack.map(c => [c.id, c]));
     if (S.mode === "pick") {
-      const pick = byId.get(S.picked);
-      const r = ranks.get(S.picked) ?? null;
+      const pick = byId.get(S.picked) || null;
+      const r = pick ? ranks.get(S.picked) ?? null : null;
       const deltas = [];
-      if (r != null) {
+      if (pick && r != null) {
         deltas.push([pick.name, r - 1]);                         // >0: overrated the pick
         if (best && best.id !== pick.id) deltas.push([best.name, -(r - 1)]); // passed the best
       }
@@ -296,7 +296,8 @@
     if (!ev.k) return `No ${M.label} data for any card in this pack.`;
     const best = ev.best ? `<strong>${esc(ev.best.name)}</strong> (${M.fmt(val(ev.best, ev.m))})` : "";
     if (S.mode === "pick") {
-      if (ev.pickRank == null) return `17lands has no ${M.label} for ${esc(ev.pick.name)}. Top card: ${best}.`;
+      if (!ev.pick) return `No pick made, so this pack isn't counted. Top card: ${best}.`;
+      if (ev.pickRank == null) return `17Lands has no ${M.label} for ${esc(ev.pick.name)}. Top card: ${best}.`;
       if (ev.pickRank === 1) return `Correct — ${best} is the top card by ${M.label}.`;
       const gap = Math.abs(val(ev.best, ev.m) - val(ev.pick, ev.m));
       const gapTxt = ev.m === "gih" || ev.m === "iwd" ? (gap * 100).toFixed(1) + "pp" : gap.toFixed(2);
@@ -311,11 +312,15 @@
     if (S.revealed) {
       D.hint.textContent = `Pack ${S.packNo} — revealed. Gold = best by ${METRICS[S.metric].label}.`;
     } else if (S.mode === "pick") {
-      D.hint.textContent = `Pack ${S.packNo} — click the card you'd take first (⤢ to enlarge first).`;
+      D.hint.textContent = S.picked == null
+        ? `Pack ${S.packNo} — click the card you'd take first (⤢ to enlarge). You can change your mind until you reveal.`
+        : `Pack ${S.packNo} — pick locked in? Reveal the 17Lands scores.`;
     } else {
       D.hint.textContent = `Pack ${S.packNo} — tap cards best-to-worst, or drag to reorder. Then reveal.`;
     }
-    D.reveal.hidden = S.mode !== "rank" || S.revealed;
+    D.reveal.hidden = S.revealed;
+    D.next.classList.toggle("primary", S.revealed);
+    D.next.classList.toggle("ghost", !S.revealed);
     D.resetRank.hidden = S.mode !== "rank" || S.revealed;
     D.resetRank.disabled = S.tapped.size === 0;
   }
@@ -325,15 +330,17 @@
     if (!d) { D.meta.textContent = ""; return; }
     const when = d.fetched ? new Date(d.fetched).toLocaleDateString() : "unknown";
     const rated = d.cards.filter(c => typeof c.gih === "number").length;
-    D.meta.textContent = `${S.set} · ${rated}/${d.cards.length} cards with 17lands data · snapshot ${when}`;
+    D.meta.textContent = `${S.set} · ${rated}/${d.cards.length} cards with 17Lands data · snapshot ${when}`;
   }
 
   // ---------- interactions ----------
   function onCardClick(id) {
     if (S.revealed) { openZoom(S.pack.find(c => c.id === id)); return; }
     if (S.mode === "pick") {
-      S.picked = id;
-      reveal();
+      // select (or switch) the pick; clicking the selected card again clears it
+      S.picked = S.picked === id ? null : id;
+      for (const [cid, n] of S.els) n.classList.toggle("picked", cid === S.picked);
+      setHint();
       return;
     }
     // rank mode: tap moves a card to just after the last placed card;
@@ -359,7 +366,7 @@
     if (S.sortable) S.sortable.option("disabled", true);
     const ev = evaluate();
     ev.mode = S.mode;
-    record(ev);
+    if (S.mode === "rank" || ev.pick) record(ev);
     paintReveal(ev);
     setHint();
     D.next.focus({ preventScroll: true });
@@ -431,6 +438,7 @@
     if (S.pack.length && !S.revealed) {
       S.tapped = new Set();
       S.picked = null;
+      for (const n of S.els.values()) n.classList.remove("picked");
       setupSortable();
       layout();
       setHint();
@@ -530,7 +538,7 @@
     if (e.target.closest("select, input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
     if (document.querySelector("dialog[open]")) return;
     if (e.key === "n" || e.key === "N") { e.preventDefault(); newPack(); }
-    else if (e.key === "Enter" && S.mode === "rank" && !S.revealed) { e.preventDefault(); reveal(); }
+    else if (e.key === "Enter" && !S.revealed) { e.preventDefault(); reveal(); }
     else if (e.key === "Enter" && S.revealed) { e.preventDefault(); newPack(); }
     else if (e.key === "s" || e.key === "S") { renderStats(); D.stats.showModal(); }
   });
