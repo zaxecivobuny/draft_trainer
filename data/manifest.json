@@ -1,13 +1,13 @@
 {
- "updated": "2026-10-26T16:09:55+00:00",
+ "updated": "2026-11-02T19:32:04+00:00",
  "sets": [
   {
    "code": "FRA",
    "name": "Reality Fracture",
    "start": "2026-09-29T15:00:00Z",
-   "fetched": "2026-10-26T16:09:55+00:00",
+   "fetched": "2026-11-02T19:32:04+00:00",
    "cards": 290,
-   "rated": 137,
+   "rated": 117,
    "live": true
   },
   {
